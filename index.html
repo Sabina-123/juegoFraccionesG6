@@ -1,274 +1,1429 @@
 <!doctype html>
 <html lang="es" class="h-full">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Misión Fracciones Ultra</title>
-    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root { --bg: #0f172a; --accent: #fbbf24; }
-        body { font-family: 'Nunito', sans-serif; background: radial-gradient(circle, #1e1b4b, #0f172a); color: #f8fafc; min-height: 100vh; overflow-x: hidden; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .fraction { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; padding: 0 10px; }
-        .bar { width: 100%; height: 3px; background: #fbbf24; margin: 2px 0; border-radius: 2px; }
-        .op-symbol { font-size: 1.8rem; font-weight: 800; color: #a78bfa; margin: 0 8px; }
-        .bracket { font-size: 2.5rem; font-weight: 300; color: #6366f1; vertical-align: middle; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; }
-    </style>
-</head>
-<body class="flex items-center justify-center p-4">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Nunito:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Nunito', sans-serif; margin: 0; }
 
-    <div id="app" class="w-full max-w-4xl">
-        <div id="screen-welcome" class="space-y-8 fade-in">
-            <div class="text-center">
-                <h1 class="text-6xl font-bold text-yellow-400 mb-2" style="font-family: 'Fredoka'">Misión Fracciones 🚀</h1>
-                <p class="text-indigo-300">Aprende, compite y domina las matemáticas</p>
-            </div>
+  .card-flip { animation: cardIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+  @keyframes cardIn {
+    0% { transform: scale(0.5) rotateY(90deg); opacity: 0; }
+    100% { transform: scale(1) rotateY(0deg); opacity: 1; }
+  }
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button onclick="startLevel(1)" class="glass p-6 rounded-3xl hover:scale-[1.02] transition-all border-b-4 border-yellow-500 text-left">
-                    <span class="text-3xl block mb-2">🟦</span>
-                    <span class="block text-xl font-bold text-white">Nivel 1: Visualización</span>
-                    <span class="text-sm text-slate-400">Figuras geométricas y fracciones.</span>
-                </button>
-                <button onclick="startLevel(2)" class="glass p-6 rounded-3xl hover:scale-[1.02] transition-all border-b-4 border-green-500 text-left">
-                    <span class="text-3xl block mb-2">➕</span>
-                    <span class="block text-xl font-bold text-white">Nivel 2: Suma/Resta Básica</span>
-                    <span class="text-sm text-slate-400">Igual denominador.</span>
-                </button>
-                <button onclick="startLevel(3)" class="glass p-6 rounded-3xl hover:scale-[1.02] transition-all border-b-4 border-blue-500 text-left">
-                    <span class="text-3xl block mb-2">🔢</span>
-                    <span class="block text-xl font-bold text-white">Nivel 3: MCM e Intermedio</span>
-                    <span class="text-sm text-slate-400">Distinto denominador.</span>
-                </button>
-                <button onclick="startLevel(4)" class="glass p-6 rounded-3xl hover:scale-[1.02] transition-all border-b-4 border-purple-500 text-left">
-                    <span class="text-3xl block mb-2">🧮</span>
-                    <span class="block text-xl font-bold text-white">Nivel 4: Combinadas PRO</span>
-                    <span class="text-sm text-slate-400">Paréntesis, Corchetes y Jerarquía.</span>
-                </button>
-            </div>
+  .bounce-in { animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+  @keyframes bounceIn {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
 
-            <div class="glass p-6 rounded-3xl mt-12 border border-white/5">
-                <h3 class="text-lg font-bold text-yellow-500 mb-4 flex items-center gap-2">
-                    📖 Manual de Instrucciones
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-slate-300">
-                    <div>
-                        <strong class="text-white block mb-1">🎯 Objetivo</strong>
-                        Responde 5 preguntas por nivel. La dificultad sube si aciertas rápido y sin errores.
-                    </div>
-                    <div>
-                        <strong class="text-white block mb-1">⌨️ Controles</strong>
-                        Usa los cuadros para Numerador (arriba) y Denominador (abajo). Pulsa "Enter" o el botón para enviar.
-                    </div>
-                    <div>
-                        <strong class="text-white block mb-1">💡 Tips</strong>
-                        En el Nivel 4, resuelve primero lo que está dentro de los paréntesis `()` y luego los corchetes `[]`.
-                    </div>
-                </div>
-            </div>
-        </div>
+  .shake { animation: shake 0.5s ease; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+  }
 
-        <div id="screen-game" class="hidden space-y-6">
-            <div class="flex justify-between items-center glass p-4 rounded-2xl">
-                <button onclick="location.reload()" class="bg-slate-800 px-4 py-2 rounded-lg text-sm hover:bg-red-500 transition-colors">Abandona Misión</button>
-                <div class="text-center">
-                    <div id="level-label" class="text-xs uppercase tracking-widest text-yellow-500 font-black">NIVEL 1</div>
-                    <div id="score-display" class="text-xl font-bold">Puntos: 0 / 5</div>
-                </div>
-                <div id="difficulty-badge" class="bg-indigo-900/50 px-3 py-1 rounded-full text-[10px] border border-indigo-500/30">DIFICULTAD: NORMAL</div>
-            </div>
+  .pulse-glow { animation: pulseGlow 2s ease-in-out infinite; }
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); }
+    50% { box-shadow: 0 0 20px 8px rgba(251, 191, 36, 0.2); }
+  }
 
-            <div class="glass p-8 rounded-[2rem] text-center min-h-[450px] flex flex-col justify-center items-center relative overflow-hidden">
-                <div id="question-text" class="mb-8 text-xl font-medium text-indigo-200"></div>
-                
-                <div id="visual-area" class="flex flex-wrap justify-center items-center gap-2 mb-12 min-h-[150px]"></div>
+  .confetti-piece {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    animation: confettiFall 1.5s ease-out forwards;
+    pointer-events: none;
+    z-index: 100;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(400px) rotate(720deg); opacity: 0; }
+  }
 
-                <div id="input-area" class="w-full max-w-xs space-y-6">
-                    <div class="flex items-center justify-center gap-4 bg-black/20 p-6 rounded-3xl border border-white/5">
-                        <input id="ans-num" type="number" placeholder="N" class="w-24 h-24 text-4xl font-bold text-center bg-slate-900 border-b-4 border-yellow-500 rounded-xl focus:bg-slate-800 outline-none transition-all">
-                        <div class="text-4xl text-slate-600 font-light">/</div>
-                        <input id="ans-den" type="number" placeholder="D" class="w-24 h-24 text-4xl font-bold text-center bg-slate-900 border-b-4 border-yellow-500 rounded-xl focus:bg-slate-800 outline-none transition-all">
-                    </div>
-                    <button onclick="checkAnswer()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-black py-5 rounded-2xl text-xl shadow-xl hover:shadow-yellow-500/20 transition-all active:scale-95">ENVIAR RESPUESTA</button>
-                </div>
-                <div id="feedback" class="mt-8 font-bold text-xl hidden scale-up"></div>
-            </div>
-        </div>
+  .stagger-1 { animation-delay: 0.1s; opacity: 0; }
+  .stagger-2 { animation-delay: 0.2s; opacity: 0; }
+  .stagger-3 { animation-delay: 0.3s; opacity: 0; }
+  .stagger-4 { animation-delay: 0.4s; opacity: 0; }
+  .stagger-5 { animation-delay: 0.5s; opacity: 0; }
+
+  .fraction-display { display: inline-flex; flex-direction: column; align-items: center; line-height: 1; }
+  .fraction-display .num { font-weight: 700; }
+  .fraction-display .bar { width: 100%; height: 3px; border-radius: 2px; margin: 2px 0; }
+  .fraction-display .den { font-weight: 700; }
+
+  .level-btn:hover { transform: translateY(-3px); }
+  .level-btn { transition: all 0.2s ease; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+</style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full">
+  <div id="app" class="h-full w-full overflow-auto" style="background: #1a1033;">
+   <!-- WELCOME SCREEN -->
+   <div id="screen-welcome" class="flex flex-col items-center justify-center h-full p-4">
+    <div class="max-w-lg w-full text-center">
+     <div class="text-6xl mb-4 bounce-in">
+      🎮
+     </div>
+     <h1 id="main-title" class="text-3xl md:text-4xl font-extrabold mb-2" style="font-family:'Fredoka',sans-serif; color:#fbbf24;">¡Juego de las Fracciones!</h1>
+     <p id="welcome-msg" class="text-lg mb-8" style="color:#c4b5fd;">¡Bienvenido al Juego de las Fracciones!</p>
+     <p class="text-sm mb-4 font-semibold" style="color:#a78bfa;">Elige tu nivel:</p>
+     <div class="grid grid-cols-2 gap-3 mb-6">
+      <button onclick="startLevelSolo(1)" class="level-btn rounded-2xl p-3 text-center border-2 border-transparent hover:border-yellow-400" style="background:#2d1f5e;">
+       <div class="text-2xl mb-1">
+        🧀
+       </div>
+       <div class="font-bold text-white text-xs">
+        Modo Quesito
+       </div>
+       <div class="text-xs" style="color:#a78bfa;">
+        Conceptos básicos
+       </div></button> <button onclick="startLevelSolo(2)" class="level-btn rounded-2xl p-3 text-center border-2 border-transparent hover:border-yellow-400" style="background:#2d1f5e;">
+       <div class="text-2xl mb-1">
+        ➕
+       </div>
+       <div class="font-bold text-white text-xs">
+        Modo Básico
+       </div>
+       <div class="text-xs" style="color:#a78bfa;">
+        Mismo denominador
+       </div></button> <button onclick="startLevelSolo(3)" class="level-btn rounded-2xl p-3 text-center border-2 border-transparent hover:border-yellow-400" style="background:#2d1f5e;">
+       <div class="text-2xl mb-1">
+        🔢
+       </div>
+       <div class="font-bold text-white text-xs">
+        Modo Intermedio
+       </div>
+       <div class="text-xs" style="color:#a78bfa;">
+        Distinto denominador
+       </div></button> <button onclick="startLevelSolo(4)" class="level-btn rounded-2xl p-3 text-center border-2 border-transparent hover:border-yellow-400" style="background:#2d1f5e;">
+       <div class="text-2xl mb-1">
+        🧮
+       </div>
+       <div class="font-bold text-white text-xs">
+        Fracciones Combinadas
+       </div>
+       <div class="text-xs" style="color:#a78bfa;">
+        Operaciones complejas
+       </div></button>
+     </div><button onclick="showScreen('screen-manual')" class="flex items-center gap-1 px-4 py-2 rounded-xl font-semibold text-sm w-full justify-center" style="background:#8b5cf6; color:white;"> <i data-lucide="book-open" style="width:16px;height:16px;"></i> Manual 📖 </button>
     </div>
+   </div><!-- GAME SCREEN -->
+   <div id="screen-game" class="hidden flex flex-col h-full p-4">
+    <div class="max-w-lg w-full mx-auto flex flex-col flex-1">
+     <!-- Header -->
+     <div class="flex items-center justify-between mb-4 gap-2 flex-wrap">
+      <button onclick="goHome()" class="flex items-center gap-1 px-3 py-1.5 rounded-xl text-sm font-semibold" style="background:#2d1f5e; color:#a78bfa;"> <i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Menú </button>
+      <div id="level-badge" class="px-3 py-1 rounded-full text-xs font-bold" style="background:#fbbf24; color:#1a1033;"></div>
+      <div id="multiplayer-indicator" class="hidden px-3 py-1 rounded-full text-xs font-bold" style="background:#3b82f6; color:white;"></div>
+      <div class="flex items-center gap-2">
+       <span class="text-sm" style="color:#a78bfa;">⭐</span> <span id="score-display" class="font-bold text-white text-sm">0</span> <span class="text-xs" style="color:#a78bfa;">/ </span> <span id="round-display" class="text-xs" style="color:#a78bfa;">0</span>
+      </div>
+     </div><!-- Progress bar -->
+     <div class="w-full h-2 rounded-full mb-5" style="background:#2d1f5e;">
+      <div id="progress-bar" class="h-full rounded-full transition-all duration-500" style="background: linear-gradient(90deg, #fbbf24, #f59e0b); width:0%;"></div>
+     </div><!-- Cards Area -->
+     <div id="cards-area" class="flex flex-wrap items-center justify-center gap-3 mb-5"></div><!-- Question -->
+     <div id="question-text" class="text-center font-bold text-lg mb-4" style="color:#e9d5ff;"></div><!-- Emoji Visual (for Quesito) -->
+     <div id="emoji-visual" class="hidden text-center text-4xl mb-4 tracking-widest"></div><!-- Answer Input -->
+     <div id="answer-area" class="flex flex-col items-center gap-3">
+      <div class="flex items-center gap-2">
+       <input id="ans-num" type="number" placeholder="Num" class="w-20 text-center rounded-xl px-3 py-2 font-bold text-lg outline-none focus:ring-2 focus:ring-yellow-400" style="background:#2d1f5e; color:#fbbf24; border:2px solid #3b2a6e;"> <span class="text-2xl font-bold" style="color:#a78bfa;">/</span> <input id="ans-den" type="number" placeholder="Den" class="w-20 text-center rounded-xl px-3 py-2 font-bold text-lg outline-none focus:ring-2 focus:ring-yellow-400" style="background:#2d1f5e; color:#fbbf24; border:2px solid #3b2a6e;">
+      </div><button id="submit-btn" onclick="checkAnswer()" class="px-8 py-2.5 rounded-xl font-bold text-sm transition-all hover:scale-105" style="background:#fbbf24; color:#1a1033;"> Comprobar ✨ </button>
+     </div><!-- Feedback -->
+     <div id="feedback" class="hidden mt-4 rounded-2xl p-4 text-center" style="background:#2d1f5e;"></div><!-- Next button -->
+     <div id="next-area" class="hidden mt-4 text-center">
+      <button onclick="nextRound()" class="px-8 py-2.5 rounded-xl font-bold text-sm transition-all hover:scale-105" style="background:#8b5cf6; color:white;"> Siguiente Ronda → </button>
+     </div>
+    </div>
+   </div>
+  </div><!-- MANUAL SCREEN -->
+  <div id="screen-manual" class="hidden flex flex-col h-full p-4 overflow-auto">
+   <div class="max-w-2xl w-full mx-auto">
+    <button onclick="goHome()" class="mb-4 flex items-center gap-1 px-3 py-1.5 rounded-xl text-sm font-semibold" style="background:#2d1f5e; color:#a78bfa;"> <i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Volver </button>
+    <h1 class="text-3xl font-extrabold mb-6" style="color:#fbbf24; font-family:'Fredoka',sans-serif;">📖 Manual del Juego</h1>
+    <div class="rounded-2xl p-6 mb-4" style="background:#2d1f5e; border-left:4px solid #fbbf24;">
+     <h2 class="text-xl font-bold mb-3" style="color:#fbbf24;">¿De qué se trata?</h2>
+     <p style="color:#c4b5fd; line-height:1.6;">El Juego de las Fracciones te ayuda a dominar operaciones con fracciones de forma divertida. Hay 4 modos progresivos: desde conceptos básicos hasta operaciones complejas. ¡Cada ronda tiene 5 desafíos!</p>
+    </div>
+    <div class="rounded-2xl p-6 mb-4" style="background:#2d1f5e; border-left:4px solid #3b82f6;">
+     <h2 class="text-xl font-bold mb-3" style="color:#3b82f6;">🎮 Los 4 Niveles</h2>
+     <div class="space-y-3">
+      <div>
+       <p style="color:#fbbf24; font-weight:bold;">🧀 MODO QUESITO</p>
+       <p style="color:#c4b5fd; font-size:14px;">Conceptos básicos con visuales divertidas. Hay 2 desafíos:<br>
+         1️⃣ <strong>Identificar</strong>: Mira el quesito y escribe la fracción<br>
+         2️⃣ <strong>Comparar</strong>: Compara dos quesitos - ¿cuál es mayor?</p>
+      </div>
+      <div>
+       <p style="color:#fbbf24; font-weight:bold;">➕ MODO BÁSICO</p>
+       <p style="color:#c4b5fd; font-size:14px;">Suma y resta de fracciones con el <strong>mismo denominador</strong>. ¡Mucho más fácil! Aprenderás a operar con fracciones simples.</p>
+      </div>
+      <div>
+       <p style="color:#fbbf24; font-weight:bold;">🔢 MODO INTERMEDIO</p>
+       <p style="color:#c4b5fd; font-size:14px;">Suma y resta con <strong>distinto denominador</strong>. Aquí necesitas encontrar el Mínimo Común Múltiplo (MCM). ¡Más desafiante!</p>
+      </div>
+      <div>
+       <p style="color:#fbbf24; font-weight:bold;">🧮 MODO COMBINADAS</p>
+       <p style="color:#c4b5fd; font-size:14px;">Operaciones complejas con paréntesis, corchetes, suma, resta, multiplicación y división. ¡El nivel máximo de dificultad! Incluye cartas especiales que te ayudan.</p>
+      </div>
+     </div>
+    </div>
+    <div class="rounded-2xl p-6 mb-4" style="background:#2d1f5e; border-left:4px solid #22c55e;">
+     <h2 class="text-xl font-bold mb-3" style="color:#22c55e;">📋 Cómo Jugar</h2>
+     <ol style="color:#c4b5fd; font-size:14px; line-height:1.8; list-style-position:inside;">
+      <li><strong>Elige un nivel</strong> desde el menú principal</li>
+      <li><strong>Lee el problema</strong> que aparece en pantalla</li>
+      <li><strong>Escribe el numerador</strong> (número arriba) en la caja izquierda</li>
+      <li><strong>Escribe el denominador</strong> (número abajo) en la caja derecha</li>
+      <li><strong>Presiona "Comprobar ✨"</strong> o Enter para verificar</li>
+      <li><strong>Recibe retroalimentación</strong> - si es correcto, ¡suma puntos! Si no, aprende de tu error</li>
+      <li><strong>Continúa</strong> hasta completar los 5 desafíos de la ronda</li>
+     </ol>
+    </div>
+    <div class="rounded-2xl p-6 mb-4" style="background:#2d1f5e; border-left:4px solid #f59e0b;">
+     <h2 class="text-xl font-bold mb-3" style="color:#f59e0b;">⭐ Sistema de Puntuación</h2>
+     <p style="color:#c4b5fd; font-size:14px; line-height:1.6;">Ganas 1 punto por cada respuesta correcta. Tu puntuación se muestra arriba a la derecha (ej: "3 / 5" significa 3 puntos de 5 desafíos). La barra de progreso te muestra cuántas rondas has completado.</p>
+    </div>
+    <div class="rounded-2xl p-6 mb-4" style="background:#2d1f5e; border-left:4px solid #ef4444;">
+     <h2 class="text-xl font-bold mb-3" style="color:#ef4444;">⚙️ Reglas Importantes</h2>
+     <ul style="color:#c4b5fd; font-size:14px; line-height:1.8; list-style-position:inside;">
+      <li><strong>Simplifica siempre</strong> que puedas (divide numerador y denominador por su MCD)</li>
+      <li>El <strong>denominador nunca puede ser 0</strong></li>
+      <li>Si la respuesta es un número entero, escribe 0 en el numerador (ej: 3/1 o 0/1 según aplique)</li>
+      <li>Usa la barra de espacio o presiona Enter para enviar tu respuesta</li>
+      <li>En el Modo Quesito, puedes elegir entre "Identificar" o "Comparar"</li>
+     </ul>
+    </div>
+    <div class="rounded-2xl p-6 mb-4" style="background:#2d1f5e; border-left:4px solid #ec4899;">
+     <h2 class="text-xl font-bold mb-3" style="color:#ec4899;">🃏 Cartas Especiales (Modo Combinadas)</h2>
+     <p style="color:#a78bfa; font-size:13px; margin-bottom:10px;">En el Modo Combinadas, puedes usar cartas especiales haciendo clic en el "?":</p>
+     <div class="space-y-2">
+      <div style="background:#1a1033; padding:8px; border-radius:8px;">
+       <p style="color:#fbbf24; font-weight:bold;">🧮 Calculadora</p>
+       <p style="color:#c4b5fd; font-size:13px;">¡Te da el resultado automáticamente! Usa la caja de entrada para verificar tu pensamiento.</p>
+      </div>
+      <div style="background:#1a1033; padding:8px; border-radius:8px;">
+       <p style="color:#fbbf24; font-weight:bold;">📐 Ábaco</p>
+       <p style="color:#c4b5fd; font-size:13px;">Te da una pista: "Resuelve primero lo que está entre paréntesis y corchetes".</p>
+      </div>
+      <div style="background:#1a1033; padding:8px; border-radius:8px;">
+       <p style="color:#fbbf24; font-weight:bold;">👨‍🏫 Profesor</p>
+       <p style="color:#c4b5fd; font-size:13px;">Te recuerda: "Simplifica dividiendo numerador y denominador por su MCD".</p>
+      </div>
+     </div>
+    </div>
+    <div class="rounded-2xl p-6 mb-4" style="background:#2d1f5e; border-left:4px solid #06b6d4;">
+     <h2 class="text-xl font-bold mb-3" style="color:#06b6d4;">💡 Consejos Útiles</h2>
+     <ol style="color:#c4b5fd; font-size:14px; line-height:1.8; list-style-position:inside;">
+      <li>Empieza con <strong>Modo Quesito</strong> para entender la idea básica de fracciones</li>
+      <li>Practica <strong>Modo Básico</strong> hasta sentirte seguro - es el fundamento</li>
+      <li>Para <strong>distinto denominador</strong>, busca el MCM: múltiplo más pequeño que comparten</li>
+      <li><strong>Simplifica siempre</strong>: encuentra el MCD (máximo común divisor) y divide ambos números</li>
+      <li>En operaciones complejas, <strong>respeta el orden</strong>: paréntesis → corchetes → × ÷ → + −</li>
+      <li>Si cometes un error, <strong>lee la explicación</strong> - ¡aprenderás más que si aciertas siempre!</li>
+      <li><strong>¡No te rindas!</strong> Las fracciones son fáciles una vez que las comprendes 🌟</li>
+     </ol>
+    </div>
+    <div class="rounded-2xl p-6 mb-4" style="background:#2d1f5e; border-left:4px solid #8b5cf6;">
+     <h2 class="text-xl font-bold mb-3" style="color:#8b5cf6;">📚 Glosario Rápido</h2>
+     <div class="space-y-2">
+      <div style="background:#1a1033; padding:8px; border-radius:8px;">
+       <p style="color:#fbbf24; font-weight:bold;">Numerador</p>
+       <p style="color:#c4b5fd; font-size:13px;">El número de arriba en una fracción (ej: en 3/5, el 3 es el numerador)</p>
+      </div>
+      <div style="background:#1a1033; padding:8px; border-radius:8px;">
+       <p style="color:#fbbf24; font-weight:bold;">Denominador</p>
+       <p style="color:#c4b5fd; font-size:13px;">El número de abajo en una fracción (ej: en 3/5, el 5 es el denominador)</p>
+      </div>
+      <div style="background:#1a1033; padding:8px; border-radius:8px;">
+       <p style="color:#fbbf24; font-weight:bold;">Simplificar</p>
+       <p style="color:#c4b5fd; font-size:13px;">Reducir una fracción a su forma más pequeña dividiendo arriba y abajo por el mismo número</p>
+      </div>
+      <div style="background:#1a1033; padding:8px; border-radius:8px;">
+       <p style="color:#fbbf24; font-weight:bold;">MCM (Mínimo Común Múltiplo)</p>
+       <p style="color:#c4b5fd; font-size:13px;">El múltiplo más pequeño que dos números comparten. Se usa para sumar/restar fracciones</p>
+      </div>
+      <div style="background:#1a1033; padding:8px; border-radius:8px;">
+       <p style="color:#fbbf24; font-weight:bold;">MCD (Máximo Común Divisor)</p>
+       <p style="color:#c4b5fd; font-size:13px;">El divisor más grande que dos números comparten. Se usa para simplificar fracciones</p>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div><!-- RESULTS SCREEN -->
+  <div id="screen-results" class="hidden flex flex-col items-center justify-center h-full p-4">
+   <div class="max-w-md w-full text-center">
+    <div class="text-6xl mb-4 bounce-in">
+     🏆
+    </div>
+    <h2 class="text-2xl font-extrabold mb-2" style="font-family:'Fredoka',sans-serif; color:#fbbf24;">¡Ronda Completada!</h2>
+    <div id="final-score" class="text-5xl font-extrabold my-4" style="color:white;"></div>
+    <div id="final-message" class="text-lg mb-6" style="color:#c4b5fd;"></div>
+    <div class="flex gap-3 justify-center">
+     <button onclick="startLevel(currentLevel)" class="px-6 py-2.5 rounded-xl font-bold text-sm" style="background:#8b5cf6; color:white;">Repetir 🔁</button> <button onclick="goHome()" class="px-6 py-2.5 rounded-xl font-bold text-sm" style="background:#fbbf24; color:#1a1033;">Menú 🏠</button>
+    </div>
+   </div>
+  </div>
+  <script>
+// State
+let currentLevel = 1;
+let gameMode = 'solo'; // 'solo' or 'multiplayer'
+let numPlayers = 1;
+let currentPlayer = 0;
+let players = [];
+let score = 0;
+let round = 0;
+const totalRounds = 5;
+let currentAnswer = { num: 0, den: 1 };
+let specialCard = null;
+let quesitoProblemType = null; // 'identify', 'compare', or 'identify_multi'
 
-    <script>
-        let state = {
-            level: 0, round: 1, score: 0, 
-            targetN: 0, targetD: 1, 
-            difficulty: 1, streak: 0
-        };
+const levelNames = { 1: '🧀 Quesito', 2: '➕ Básico', 3: '🔢 Intermedio', 4: '🃏 Experto' };
+const ops = ['+', '-'];
 
-        function startLevel(n) {
-            state.level = n;
-            state.round = 1;
-            state.score = 0;
-            state.difficulty = 1;
-            state.streak = 0;
-            document.getElementById('screen-welcome').classList.add('hidden');
-            document.getElementById('screen-game').classList.remove('hidden');
-            loadRound();
-        }
+// Default config
+const defaultConfig = {
+  game_title: '¡Juego de las Fracciones!',
+  welcome_message: '¡Bienvenido al Juego de las Fracciones!',
+  background_color: '#1a1033',
+  card_color: '#2d1f5e',
+  accent_color: '#fbbf24',
+  text_color: '#e9d5ff',
+  button_color: '#8b5cf6'
+};
 
-        function loadRound() {
-            if(state.round > 5) {
-                finishGame();
-                return;
-            }
-            
-            updateUI();
-            const area = document.getElementById('visual-area');
-            const qText = document.getElementById('question-text');
-            area.innerHTML = "";
+// Element SDK
+window.elementSdk.init({
+  defaultConfig,
+  onConfigChange: async (config) => {
+    const bg = config.background_color || defaultConfig.background_color;
+    const card = config.card_color || defaultConfig.card_color;
+    const accent = config.accent_color || defaultConfig.accent_color;
+    const text = config.text_color || defaultConfig.text_color;
+    const btn = config.button_color || defaultConfig.button_color;
+    const font = config.font_family;
+    const fontSize = config.font_size || 16;
 
-            // Lógica de niveles
-            switch(state.level) {
-                case 1: generateLevel1(area, qText); break;
-                case 2: generateLevel2(area, qText); break;
-                case 3: generateLevel3(area, qText); break;
-                case 4: generateLevel4(area, qText); break;
-            }
-        }
+    document.getElementById('app').style.background = bg;
+    document.getElementById('main-title').textContent = config.game_title || defaultConfig.game_title;
+    document.getElementById('welcome-msg').textContent = config.welcome_message || defaultConfig.welcome_message;
+    document.getElementById('main-title').style.color = accent;
+    document.getElementById('welcome-msg').style.color = text;
 
-        function updateUI() {
-            document.getElementById('level-label').innerText = `NIVEL ${state.level}`;
-            document.getElementById('score-display').innerText = `Puntos: ${state.score} / 5 (Ronda ${state.round})`;
-            document.getElementById('difficulty-badge').innerText = `DIFICULTAD: ${state.difficulty > 1 ? 'ALTA 🔥' : 'NORMAL'}`;
-            document.getElementById('feedback').classList.add('hidden');
-            document.getElementById('ans-num').value = "";
-            document.getElementById('ans-den').value = "";
-        }
+    if (font) {
+      document.body.style.fontFamily = `${font}, Nunito, sans-serif`;
+    }
+    document.body.style.fontSize = `${fontSize}px`;
 
-        // --- NIVEL 1: MULTIFIGURAS ---
-        function generateLevel1(area, qText) {
-            qText.innerText = "Identifica la fracción de la figura:";
-            let d = (Math.floor(Math.random() * 5) + 3) * state.difficulty;
-            let n = Math.floor(Math.random() * (d - 1)) + 1;
-            state.targetN = n; state.targetD = d;
+    // Update card backgrounds
+    document.querySelectorAll('.game-card').forEach(c => c.style.background = card);
+    document.querySelectorAll('.level-btn').forEach(b => b.style.background = card);
+    document.getElementById('question-text').style.color = text;
 
-            const types = ['circle', 'bar', 'grid'];
-            const type = types[Math.floor(Math.random() * types.length)];
-            
-            if(type === 'circle') area.innerHTML = drawCircle(n, d);
-            else if(type === 'bar') area.innerHTML = drawBar(n, d);
-            else area.innerHTML = drawGrid(n, d);
-        }
+    // Accent elements
+    document.querySelectorAll('.accent-bg').forEach(el => el.style.background = accent);
+    document.querySelectorAll('.accent-text').forEach(el => el.style.color = accent);
+    document.querySelectorAll('.btn-primary').forEach(el => { el.style.background = btn; el.style.color = 'white'; });
+  },
+  mapToCapabilities: (config) => ({
+    recolorables: [
+      { get: () => config.background_color || defaultConfig.background_color, set: v => { config.background_color = v; window.elementSdk.setConfig({ background_color: v }); } },
+      { get: () => config.card_color || defaultConfig.card_color, set: v => { config.card_color = v; window.elementSdk.setConfig({ card_color: v }); } },
+      { get: () => config.text_color || defaultConfig.text_color, set: v => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+      { get: () => config.accent_color || defaultConfig.accent_color, set: v => { config.accent_color = v; window.elementSdk.setConfig({ accent_color: v }); } },
+      { get: () => config.button_color || defaultConfig.button_color, set: v => { config.button_color = v; window.elementSdk.setConfig({ button_color: v }); } }
+    ],
+    borderables: [],
+    fontEditable: {
+      get: () => config.font_family || 'Nunito',
+      set: v => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); }
+    },
+    fontSizeable: {
+      get: () => config.font_size || 16,
+      set: v => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); }
+    }
+  }),
+  mapToEditPanelValues: (config) => new Map([
+    ['game_title', config.game_title || defaultConfig.game_title],
+    ['welcome_message', config.welcome_message || defaultConfig.welcome_message]
+  ])
+});
 
-        // --- NIVEL 4: COMBINADAS CON CORCHETES ---
-        function generateLevel4(area, qText) {
-            qText.innerText = "Resuelve respetando paréntesis () y corchetes []:";
-            // Estructura: [ (a/b + c/d) * e/f ]
-            let d_base = 2 * state.difficulty;
-            let n1=1, d1=2, n2=1, d2=2, n3=1, d3=3;
-            
-            // Resultado del paréntesis (1/2 + 1/2) = 1
-            let pN = (n1*d2 + n2*d1);
-            let pD = (d1*d2);
-            
-            // Resultado final [ 1 * 1/3 ] = 1/3
-            state.targetN = pN * n3;
-            state.targetD = pD * d3;
+// Helpers
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { [a, b] = [b, a % b]; } return a; }
+function simplify(n, d) { if (d === 0) return { n: 0, d: 1 }; const g = gcd(n, d); return { n: n / g, d: d / g }; }
+function lcm(a, b) { return (a * b) / gcd(a, b); }
 
-            area.innerHTML = `
-                <span class="bracket">[</span>
-                <span class="text-2xl text-slate-400 mx-1">(</span>
-                ${drawFrac(n1,d1)} <span class="op-symbol">+</span> ${drawFrac(n2,d2)}
-                <span class="text-2xl text-slate-400 mx-1">)</span>
-                <span class="op-symbol">·</span>
-                ${drawFrac(n3,d3)}
-                <span class="bracket">]</span>
-            `;
-        }
+function showScreen(id) {
+  ['screen-welcome', 'screen-game', 'screen-results', 'screen-manual'].forEach(s => {
+    const screen = document.getElementById(s);
+    if (screen) {
+      screen.classList.toggle('hidden', s !== id);
+    }
+  });
+}
 
-        // --- GENERADORES NIVEL 2 Y 3 ---
-        function generateLevel2(area, qText) {
-            qText.innerText = "Mismo denominador:";
-            let d = (Math.floor(Math.random() * 5) + 2) * state.difficulty;
-            let n1 = Math.floor(Math.random() * 5) + 2;
-            let n2 = Math.floor(Math.random() * 2) + 1;
-            let op = Math.random() > 0.5 ? '+' : '-';
-            state.targetN = op === '+' ? n1+n2 : n1-n2;
-            state.targetD = d;
-            area.innerHTML = `${drawFrac(n1,d)} <span class="op-symbol">${op}</span> ${drawFrac(n2,d)}`;
-        }
+function goHome() {
+  showScreen('screen-welcome');
+}
 
-        function generateLevel3(area, qText) {
-            qText.innerText = "Distinto denominador (MCM):";
-            let d1 = 2 * state.difficulty, d2 = 3 * state.difficulty;
-            let n1 = 1, n2 = 1;
-            state.targetN = (n1*d2 + n2*d1);
-            state.targetD = d1*d2;
-            area.innerHTML = `${drawFrac(n1,d1)} <span class="op-symbol">+</span> ${drawFrac(n2,d2)}`;
-        }
+function startLevelSolo(level) {
+  gameMode = 'solo';
+  numPlayers = 1;
+  players = [{ name: 'Jugador', score: 0 }];
+  currentPlayer = 0;
+  currentLevel = level;
+  score = 0;
+  round = 0;
+  showScreen('screen-game');
+  document.getElementById('level-badge').textContent = levelNames[level];
+  document.getElementById('multiplayer-indicator').classList.add('hidden');
+  updateScoreUI();
+  nextRound();
+  lucide.createIcons();
+}
 
-        // --- DIBUJO DE FIGURAS ---
-        function drawFrac(n, d) {
-            return `<div class="fraction"><span>${n}</span><div class="bar"></div><span>${d}</span></div>`;
-        }
+function updateScoreUI() {
+  document.getElementById('score-display').textContent = score;
+  document.getElementById('round-display').textContent = round + '/' + totalRounds;
+  document.getElementById('progress-bar').style.width = ((round / totalRounds) * 100) + '%';
+}
 
-        function drawCircle(n, d) {
-            let svg = `<svg width="150" height="150" viewBox="0 0 100 100">`;
-            for (let i = 0; i < d; i++) {
-                const s = (i * 360) / d, e = ((i + 1) * 360) / d;
-                const x1 = 50 + 40 * Math.cos(Math.PI * s / 180), y1 = 50 + 40 * Math.sin(Math.PI * s / 180);
-                const x2 = 50 + 40 * Math.cos(Math.PI * e / 180), y2 = 50 + 40 * Math.sin(Math.PI * e / 180);
-                svg += `<path d="M50,50 L${x1},${y1} A40,40 0 0,1 ${x2},${y2} Z" fill="${i < n ? '#fbbf24' : '#334155'}" stroke="#0f172a"/>`;
-            }
-            return svg + `</svg>`;
-        }
+function nextRound() {
+  if (round >= totalRounds) { 
+    if (gameMode === 'solo') {
+      showResults();
+    } else {
+      showMultiplayerRound();
+    }
+    return;
+  }
+  round++;
+  updateScoreUI();
+  document.getElementById('feedback').classList.add('hidden');
+  document.getElementById('next-area').classList.add('hidden');
+  document.getElementById('answer-area').style.display = 'flex';
+  document.getElementById('ans-num').value = '';
+  document.getElementById('ans-den').value = '';
+  document.getElementById('emoji-visual').classList.add('hidden');
+  specialCard = null;
+  useSpecialCard = false;
+  basicSpecialCardData = null;
+  quesitoProblemType = null;
 
-        function drawBar(n, d) {
-            let html = `<div class="flex border-2 border-slate-600 rounded-lg overflow-hidden h-16 w-64">`;
-            for(let i=0; i<d; i++) {
-                html += `<div class="flex-1 border-r border-slate-700 ${i < n ? 'bg-yellow-500' : 'bg-slate-800'}"></div>`;
-            }
-            return html + `</div>`;
-        }
+  if (currentLevel === 1) showQuesitoProblemMenu();
+  else if (currentLevel === 2) generateSameDen();
+  else if (currentLevel === 3) generateDiffDen();
+  else generateCombinedOperations();
+}
 
-        function drawGrid(n, d) {
-            let html = `<div class="grid grid-cols-4 gap-1 p-2 bg-slate-700 rounded-lg">`;
-            for(let i=0; i<d; i++) {
-                html += `<div class="w-8 h-8 rounded-sm ${i < n ? 'bg-yellow-500' : 'bg-slate-800'}"></div>`;
-            }
-            return html + `</div>`;
-        }
+// Card HTML builder
+function makeCard(label, content, emoji, delay) {
+  return `<div class="card-flip stagger-${delay} game-card rounded-2xl p-4 text-center shadow-lg min-w-[100px]" style="background:#2d1f5e; border:2px solid #3b2a6e;">
+    <div class="text-xs font-semibold mb-1" style="color:#a78bfa;">${label}</div>
+    <div class="text-2xl font-extrabold" style="color:#fbbf24; font-family:'Fredoka',sans-serif;">${content}</div>
+    ${emoji ? `<div class="text-lg mt-1">${emoji}</div>` : ''}
+  </div>`;
+}
 
-        function checkAnswer() {
-            const uN = parseInt(document.getElementById('ans-num').value);
-            const uD = parseInt(document.getElementById('ans-den').value);
-            if(isNaN(uN) || isNaN(uD)) return;
+function fractionHTML(n, d) {
+  return `<span class="fraction-display"><span class="num">${n}</span><span class="bar" style="background:#a78bfa;"></span><span class="den">${d}</span></span>`;
+}
 
-            const isCorrect = (uN * state.targetD === uD * state.targetN);
-            const fb = document.getElementById('feedback');
-            fb.classList.remove('hidden');
+// Level 1: Quesito - Menu to choose problem type
+function showQuesitoProblemMenu() {
+  document.getElementById('cards-area').innerHTML = '';
+  document.getElementById('answer-area').style.display = 'none';
+  document.getElementById('feedback').classList.add('hidden');
+  document.getElementById('emoji-visual').classList.add('hidden');
+  
+  const questionArea = document.getElementById('question-text');
+  questionArea.innerHTML = `
+    <div class="text-center">
+      <div style="font-size:20px; font-weight:bold; margin-bottom:20px; color:#fbbf24;">🧀 ELIGE TU DESAFÍO</div>
+      <div style="display:flex; flex-direction:column; gap:10px; max-width:320px; margin:0 auto;">
+        <button onclick="startQuesitoProblem('identify')" class="px-3 py-3 rounded-lg font-bold transition-all hover:scale-105" style="background:#3b82f6; color:white; text-align:left; border:none; cursor:pointer; font-size:14px;">
+          <div style="font-size:16px; margin-bottom:2px;">1️⃣ IDENTIFICAR FRACCIÓN</div>
+          <div style="font-size:11px; opacity:0.85;">Mira el quesito y escribe la fracción</div>
+        </button>
+        <button onclick="startQuesitoProblem('compare')" class="px-3 py-3 rounded-lg font-bold transition-all hover:scale-105" style="background:#22c55e; color:white; text-align:left; border:none; cursor:pointer; font-size:14px;">
+          <div style="font-size:16px; margin-bottom:2px;">2️⃣ COMPARAR FRACCIONES</div>
+          <div style="font-size:11px; opacity:0.85;">Compara dos quesitos: ¿cuál es mayor?</div>
+        </button>
+        <button onclick="goHome()" class="px-3 py-3 rounded-lg font-bold transition-all hover:scale-105" style="background:#6b7280; color:white; border:none; cursor:pointer; font-size:14px;">
+          ❌ SALIR AL MENÚ
+        </button>
+      </div>
+    </div>
+  `;
+}
 
-            if(isCorrect) {
-                state.score++; state.streak++;
-                if(state.streak >= 2) state.difficulty = 2; // Sube dificultad
-                fb.innerText = "✨ ¡EXCELENTE TRABAJO!";
-                fb.className = "mt-8 font-bold text-xl text-green-400 scale-up";
-            } else {
-                state.streak = 0; state.difficulty = 1; // Baja dificultad
-                fb.innerText = `💥 ¡UPS! La respuesta era ${state.targetN}/${state.targetD}`;
-                fb.className = "mt-8 font-bold text-xl text-red-400 scale-up";
-            }
+function startQuesitoProblem(problemType) {
+  quesitoProblemType = problemType;
+  document.getElementById('question-text').innerHTML = '';
+  document.getElementById('answer-area').style.display = 'none';
+  
+  if (problemType === 'identify') {
+    generateQuesito();
+  } else if (problemType === 'compare') {
+    generateQuesitoBinaryCompare();
+  } else if (problemType === 'identify_multi') {
+    generateQuesitosMultiple();
+  }
+}
 
-            setTimeout(() => {
-                state.round++;
-                loadRound();
-            }, 2500);
-        }
+function getRandomShape() {
+  return 'circle';
+}
 
-        function finishGame() {
-            alert(`Misión Finalizada. Puntos: ${state.score}/5`);
-            location.reload();
-        }
-    </script>
-</body>
+// Level 1a: Identify single fraction with random shape
+function generateQuesito() {
+  const den = rand(2, 8);
+  const num = rand(1, den - 1);
+  currentAnswer = { num, den };
+  const shape = getRandomShape();
+
+  // Create shape visual divided into parts
+  let visual, question;
+  
+  if (shape === 'circle') {
+    visual = createCheeseWheel(num, den);
+    question = `¿Qué fracción del círculo está coloreada? 🟡`;
+  } else if (shape === 'square') {
+    visual = createDividedSquare(num, den);
+    question = `¿Qué fracción del cuadrado está coloreada? ◼️`;
+  } else if (shape === 'triangle') {
+    visual = createDividedTriangle(num, den);
+    question = `¿Qué fracción del triángulo está coloreada? 🔺`;
+  } else if (shape === 'rectangle') {
+    visual = createDividedRectangle(num, den);
+    question = `¿Qué fracción del rectángulo está coloreada? ▭`;
+  } else if (shape === 'hexagon') {
+    visual = createDividedHexagon(num, den);
+    question = `¿Qué fracción del hexágono está coloreada? ⬡`;
+  }
+  
+  document.getElementById('emoji-visual').innerHTML = visual;
+  document.getElementById('emoji-visual').classList.remove('hidden');
+  document.getElementById('cards-area').innerHTML = '';
+  document.getElementById('question-text').textContent = question;
+  document.getElementById('answer-area').style.display = 'flex';
+}
+
+// Level 1b: Compare two fractions
+function generateQuesitoBinaryCompare() {
+  let den1, num1, den2, num2;
+  
+  do {
+    den1 = rand(2, 8);
+    num1 = rand(1, den1 - 1);
+    den2 = rand(2, 8);
+    num2 = rand(1, den2 - 1);
+  } while (num1 === num2 && den1 === den2); // Make sure they're different
+
+  const cheese1 = createCheeseWheel(num1, den1);
+  const cheese2 = createCheeseWheel(num2, den2);
+  
+  let correctAnswer;
+  // Compare by converting to common denominator
+  const cd = lcm(den1, den2);
+  const adj1 = num1 * (cd / den1);
+  const adj2 = num2 * (cd / den2);
+  
+  if (adj1 < adj2) correctAnswer = '<';
+  else if (adj1 > adj2) correctAnswer = '>';
+  else correctAnswer = '=';
+
+  currentAnswer = { comparison: correctAnswer, frac1: `${num1}/${den1}`, frac2: `${num2}/${den2}` };
+
+  document.getElementById('cards-area').innerHTML = '';
+  document.getElementById('emoji-visual').innerHTML = `
+    <div style="display:flex; justify-content:center; gap:30px; flex-wrap:wrap; align-items:center;">
+      <div style="text-align:center;">
+        <div style="font-weight:bold; margin-bottom:8px; color:#fbbf24;">${num1}/${den1}</div>
+        ${cheese1}
+      </div>
+      <div style="font-size:36px; color:#fbbf24; font-weight:bold;">?</div>
+      <div style="text-align:center;">
+        <div style="font-weight:bold; margin-bottom:8px; color:#fbbf24;">${num2}/${den2}</div>
+        ${cheese2}
+      </div>
+    </div>
+    <div style="margin-top:20px; display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; max-width:300px; margin-left:auto; margin-right:auto;">
+      <button onclick="checkQuesitoBinaryCompare('<')" class="px-3 py-3 rounded-lg font-bold transition-all hover:scale-105" style="background:#ef4444; color:white; border:none; cursor:pointer; font-size:16px;">MENOR&lt;</button>
+      <button onclick="checkQuesitoBinaryCompare('=')" class="px-3 py-3 rounded-lg font-bold transition-all hover:scale-105" style="background:#3b82f6; color:white; border:none; cursor:pointer; font-size:16px;">IGUAL=</button>
+      <button onclick="checkQuesitoBinaryCompare('>')" class="px-3 py-3 rounded-lg font-bold transition-all hover:scale-105" style="background:#22c55e; color:white; border:none; cursor:pointer; font-size:16px;">MAYOR&gt;</button>
+    </div>
+  `;
+  document.getElementById('emoji-visual').classList.remove('hidden');
+  document.getElementById('question-text').textContent = '¿Cuál quesito tiene más fracción comida?';
+  document.getElementById('answer-area').style.display = 'none';
+}
+
+function checkQuesitoBinaryCompare(answer) {
+  const correct = answer === currentAnswer.comparison;
+  
+  let msg = '';
+  if (correct) {
+    msg = `✅ ¡Correcto! ${currentAnswer.frac1} es ${answer === '<' ? 'MENOR' : (answer === '>' ? 'MAYOR' : 'IGUAL')} que ${currentAnswer.frac2}`;
+  } else {
+    msg = `❌ Incorrecto. ${currentAnswer.frac1} es ${currentAnswer.comparison === '<' ? 'MENOR' : (currentAnswer.comparison === '>' ? 'MAYOR' : 'IGUAL')} que ${currentAnswer.frac2}`;
+  }
+  
+  if (correct) {
+    score++;
+    updateScoreUI();
+    spawnConfetti();
+  }
+  
+  showFeedback(correct, msg);
+  document.getElementById('answer-area').style.display = 'none';
+  document.getElementById('next-area').classList.remove('hidden');
+}
+
+// Level 1c: Identify multiple fractions (mixed format: whole + fraction)
+function generateQuesitosMultiple() {
+  const numCheeses = rand(2, 4); // 2 to 4 quesitos
+  let quesitos = [];
+  let attempts = 0;
+  
+  while (quesitos.length < numCheeses && attempts < 50) {
+    const whole = rand(0, 3);
+    const den = rand(2, 8);
+    const num = rand(whole === 0 ? 1 : 0, den - 1);
+    
+    // Skip if it's 0/x or if this fraction is already used
+    if (whole === 0 && num === 0) {
+      attempts++;
+      continue;
+    }
+    
+    const exists = quesitos.some(q => q.whole === whole && q.num === num && q.den === den);
+    if (!exists) {
+      quesitos.push({ whole, num, den, index: quesitos.length });
+    }
+    attempts++;
+  }
+  
+  currentAnswer = quesitos;
+  
+  let cheesesHTML = '';
+  quesitos.forEach((q, i) => {
+    const displayText = q.whole > 0 ? `${q.whole} ${q.num > 0 ? q.num + '/' + q.den : ''}` : `${q.num}/${q.den}`;
+    cheesesHTML += `
+      <div style="text-align:center; margin:15px;">
+        <div style="font-weight:bold; margin-bottom:8px; color:#a78bfa;">Quesito ${i + 1}</div>
+        ${createWholeAndFractionWheel(q.whole, q.num, q.den)}
+        <div style="display:flex; gap:8px; justify-content:center; margin-top:12px; flex-wrap:wrap; align-items:center;">
+          <input type="number" id="ans-whole-${i}" placeholder="Enteros" class="w-16 text-center rounded-lg px-2 py-1 font-bold text-sm" style="background:#2d1f5e; color:#fbbf24; border:2px solid #3b2a6e;" value="${q.whole > 0 ? q.whole : ''}">
+          <span style="color:#a78bfa; font-weight:bold;">+</span>
+          <input type="number" id="ans-num-${i}" placeholder="Num" class="w-12 text-center rounded-lg px-2 py-1 font-bold text-sm" style="background:#2d1f5e; color:#fbbf24; border:2px solid #3b2a6e;">
+          <span style="color:#a78bfa; font-weight:bold;">/</span>
+          <input type="number" id="ans-den-${i}" placeholder="Den" class="w-12 text-center rounded-lg px-2 py-1 font-bold text-sm" style="background:#2d1f5e; color:#fbbf24; border:2px solid #3b2a6e;">
+        </div>
+      </div>
+    `;
+  });
+  
+  document.getElementById('cards-area').innerHTML = '';
+  document.getElementById('emoji-visual').innerHTML = cheesesHTML;
+  document.getElementById('emoji-visual').classList.remove('hidden');
+  document.getElementById('question-text').textContent = `Escribe la fracción de cada quesito en formato: enteros + fracción (${numCheeses} en total)`;
+  
+  // Custom answer area for multiple quesitos
+  document.getElementById('answer-area').innerHTML = `
+    <button onclick="checkQuesitosMultiple()" class="px-8 py-2.5 rounded-xl font-bold text-sm transition-all hover:scale-105" style="background:#fbbf24; color:#1a1033; margin-top:20px;"> Comprobar ✨ </button>
+  `;
+  document.getElementById('answer-area').style.display = 'flex';
+  document.getElementById('answer-area').style.flexDirection = 'column';
+  document.getElementById('answer-area').style.alignItems = 'center';
+}
+
+function checkQuesitosMultiple() {
+  let allCorrect = true;
+  let userAnswers = [];
+  
+  for (let i = 0; i < currentAnswer.length; i++) {
+    const whole = parseInt(document.getElementById(`ans-whole-${i}`).value) || 0;
+    const num = parseInt(document.getElementById(`ans-num-${i}`).value);
+    const den = parseInt(document.getElementById(`ans-den-${i}`).value);
+    
+    if (isNaN(num) || isNaN(den) || den === 0) {
+      showFeedback(false, 'Escribe fracciones válidas en todos los quesitos (el denominador no puede ser 0).');
+      return;
+    }
+    
+    const correct = whole === currentAnswer[i].whole && num === currentAnswer[i].num && den === currentAnswer[i].den;
+    
+    const userDisplay = whole > 0 ? `${whole}+${num}/${den}` : `${num}/${den}`;
+    const actualDisplay = currentAnswer[i].whole > 0 ? `${currentAnswer[i].whole}+${currentAnswer[i].num}/${currentAnswer[i].den}` : `${currentAnswer[i].num}/${currentAnswer[i].den}`;
+    
+    userAnswers.push({ correct, user: userDisplay, actual: actualDisplay });
+    if (!correct) allCorrect = false;
+  }
+  
+  if (allCorrect) {
+    score++;
+    updateScoreUI();
+    spawnConfetti();
+    showFeedback(true, '🎉 ¡Muy bien! ¡Todas las fracciones son correctas!');
+  } else {
+    let msg = '❌ Algunas fracciones no son correctas:\n\n';
+    userAnswers.forEach((ua, i) => {
+      msg += `Quesito ${i + 1}: ${ua.correct ? '✅' : '❌ Escribiste ' + ua.user + ', debería ser ' + ua.actual}\n`;
+    });
+    showFeedback(false, msg);
+  }
+  
+  document.getElementById('answer-area').style.display = 'none';
+  document.getElementById('next-area').classList.remove('hidden');
+}
+
+function createWholeAndFractionWheel(wholes, filled, total) {
+  let svg = '';
+  
+  // Draw whole quesitos
+  let xOffset = 0;
+  for (let w = 0; w < wholes; w++) {
+    svg += createCheeseWheelAtPosition(total, total, xOffset);
+    xOffset += 230;
+  }
+  
+  // Draw fractional quesito
+  if (filled > 0 || wholes === 0) {
+    svg += `<text x="${xOffset + 15}" y="30" font-size="16" font-weight="bold" fill="#a78bfa">+</text>`;
+    svg += createCheeseWheelAtPosition(filled, total, xOffset + 30);
+  }
+  
+  return `<svg width="${Math.max(230, xOffset + 230)}" height="220" viewBox="0 0 ${Math.max(230, xOffset + 230)} 220" style="display:inline-block; margin: 10px auto;">
+    ${svg}
+  </svg>`;
+}
+
+function createCheeseWheelAtPosition(filled, total, offsetX) {
+  const size = 200;
+  const radius = size / 2;
+  const angleSlice = (2 * Math.PI) / total;
+  let paths = '';
+  
+  for (let i = 0; i < total; i++) {
+    const startAngle = (i * angleSlice) - Math.PI / 2;
+    const endAngle = ((i + 1) * angleSlice) - Math.PI / 2;
+    
+    const x1 = radius + radius * Math.cos(startAngle);
+    const y1 = radius + radius * Math.sin(startAngle);
+    const x2 = radius + radius * Math.cos(endAngle);
+    const y2 = radius + radius * Math.sin(endAngle);
+    
+    const largeArc = angleSlice > Math.PI ? 1 : 0;
+    const isEaten = i < filled;
+    const color = isEaten ? '#fbbf24' : '#c4b5fd';
+    const opacity = isEaten ? '0.9' : '0.3';
+    
+    const pathData = `M ${offsetX + radius} ${radius} L ${offsetX + x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${offsetX + x2} ${y2} Z`;
+    paths += `<path d="${pathData}" fill="${color}" opacity="${opacity}" stroke="#1a1033" stroke-width="2"/>`;
+  }
+  
+  return paths;
+}
+
+function createCheeseWheel(filled, total) {
+  const size = 200;
+  const radius = size / 2;
+  const angleSlice = (2 * Math.PI) / total;
+  
+  let svgPaths = '';
+  
+  for (let i = 0; i < total; i++) {
+    const startAngle = (i * angleSlice) - Math.PI / 2;
+    const endAngle = ((i + 1) * angleSlice) - Math.PI / 2;
+    
+    const x1 = radius + radius * Math.cos(startAngle);
+    const y1 = radius + radius * Math.sin(startAngle);
+    const x2 = radius + radius * Math.cos(endAngle);
+    const y2 = radius + radius * Math.sin(endAngle);
+    
+    const largeArc = angleSlice > Math.PI ? 1 : 0;
+    const isEaten = i < filled;
+    const color = isEaten ? '#fbbf24' : '#c4b5fd';
+    const opacity = isEaten ? '0.9' : '0.3';
+    
+    const pathData = `M ${radius} ${radius} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+    svgPaths += `<path d="${pathData}" fill="${color}" opacity="${opacity}" stroke="#1a1033" stroke-width="2"/>`;
+  }
+  
+  return `<svg width="220" height="220" viewBox="0 0 ${size} ${size}" style="display:inline-block; margin: 10px auto;">
+    ${svgPaths}
+  </svg>`;
+}
+
+function createDividedSquare(filled, total) {
+  // Arrange divisions in a grid (2x2, 3x3, 4x4, etc.)
+  const gridSize = Math.ceil(Math.sqrt(total));
+  const cellSize = 200 / gridSize;
+  
+  let svgPaths = '';
+  let count = 0;
+  
+  for (let row = 0; row < gridSize; row++) {
+    for (let col = 0; col < gridSize; col++) {
+      if (count >= total) break;
+      
+      const x = col * cellSize;
+      const y = row * cellSize;
+      const isFilled = count < filled;
+      const color = isFilled ? '#fbbf24' : '#c4b5fd';
+      const opacity = isFilled ? '0.9' : '0.3';
+      
+      svgPaths += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" fill="${color}" opacity="${opacity}" stroke="#1a1033" stroke-width="2"/>`;
+      count++;
+    }
+  }
+  
+  return `<svg width="220" height="220" viewBox="0 0 200 200" style="display:inline-block; margin: 10px auto;">
+    ${svgPaths}
+  </svg>`;
+}
+
+function createDividedTriangle(filled, total) {
+  // Create a proper triangular subdivisions (equilateral triangle divided into smaller triangles)
+  const size = 200;
+  const height = size * Math.sqrt(3) / 2;
+  
+  // Determine grid size (1, 4, 9, 16, 25... triangles = n²)
+  let n = Math.sqrt(total);
+  if (n !== Math.floor(n)) {
+    n = Math.ceil(n); // Round up if not a perfect square
+  }
+  n = Math.max(1, Math.floor(n));
+  
+  let svgPaths = '';
+  let count = 0;
+  
+  const cellSize = size / n;
+  const cellHeight = height / n;
+  
+  for (let row = 0; row < n; row++) {
+    for (let col = 0; col < n - row; col++) {
+      if (count >= total) break;
+      
+      // Calculate positions for each small triangle
+      const x1 = col * cellSize + row * cellSize / 2;
+      const y1 = row * cellHeight;
+      const x2 = x1 + cellSize;
+      const y2 = y1;
+      const x3 = x1 + cellSize / 2;
+      const y3 = y1 + cellHeight;
+      
+      const isFilled = count < filled;
+      const color = isFilled ? '#fbbf24' : '#c4b5fd';
+      const opacity = isFilled ? '0.9' : '0.3';
+      
+      svgPaths += `<polygon points="${x1},${y1} ${x2},${y2} ${x3},${y3}" fill="${color}" opacity="${opacity}" stroke="#1a1033" stroke-width="1.5"/>`;
+      count++;
+      
+      if (count >= total) break;
+      
+      // Inverted triangle
+      const ix1 = x1 + cellSize / 2;
+      const iy1 = y1;
+      const ix2 = x2;
+      const iy2 = y1 + cellHeight;
+      const ix3 = x1 + cellSize;
+      const iy3 = y1 + cellHeight;
+      
+      const isFilled2 = count < filled;
+      const color2 = isFilled2 ? '#fbbf24' : '#c4b5fd';
+      const opacity2 = isFilled2 ? '0.9' : '0.3';
+      
+      svgPaths += `<polygon points="${ix1},${iy1} ${ix2},${iy2} ${ix3},${iy3}" fill="${color2}" opacity="${opacity2}" stroke="#1a1033" stroke-width="1.5"/>`;
+      count++;
+    }
+  }
+  
+  return `<svg width="220" height="220" viewBox="0 0 ${size} ${size + 20}" style="display:inline-block; margin: 10px auto;">
+    ${svgPaths}
+  </svg>`;
+}
+
+function createDividedRectangle(filled, total) {
+  // Horizontal bars division
+  const barHeight = 200 / total;
+  let svgPaths = '';
+  
+  for (let i = 0; i < total; i++) {
+    const y = i * barHeight;
+    const isFilled = i < filled;
+    const color = isFilled ? '#fbbf24' : '#c4b5fd';
+    const opacity = isFilled ? '0.9' : '0.3';
+    
+    svgPaths += `<rect x="0" y="${y}" width="200" height="${barHeight}" fill="${color}" opacity="${opacity}" stroke="#1a1033" stroke-width="2"/>`;
+  }
+  
+  return `<svg width="220" height="220" viewBox="0 0 200 200" style="display:inline-block; margin: 10px auto;">
+    ${svgPaths}
+  </svg>`;
+}
+
+function createDividedHexagon(filled, total) {
+  // Create hexagonal divisions arranged in honeycomb pattern
+  const size = 200;
+  const hexSize = 30;
+  
+  let svgPaths = '';
+  let count = 0;
+  
+  // Draw hexagons in a honeycomb arrangement
+  const cols = Math.ceil(Math.sqrt(total * 1.5));
+  const rows = Math.ceil(total / cols);
+  
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      if (count >= total) break;
+      
+      const x = col * hexSize * 1.5 + (row % 2) * hexSize * 0.75;
+      const y = row * hexSize * 1.3;
+      
+      if (x + hexSize > size || y + hexSize > size) continue;
+      
+      let hexPoints = '';
+      for (let i = 0; i < 6; i++) {
+        const angle = (i * 60) * Math.PI / 180;
+        const px = x + hexSize/2 + (hexSize/2) * Math.cos(angle);
+        const py = y + hexSize/2 + (hexSize/2) * Math.sin(angle);
+        hexPoints += (i === 0 ? '' : ' ') + px + ',' + py;
+      }
+      
+      const isFilled = count < filled;
+      const color = isFilled ? '#fbbf24' : '#c4b5fd';
+      const opacity = isFilled ? '0.9' : '0.3';
+      
+      svgPaths += `<polygon points="${hexPoints}" fill="${color}" opacity="${opacity}" stroke="#1a1033" stroke-width="1.5"/>`;
+      count++;
+    }
+  }
+  
+  return `<svg width="220" height="220" viewBox="0 0 ${size} ${size}" style="display:inline-block; margin: 10px auto;">
+    ${svgPaths}
+  </svg>`;
+}
+
+function createDividedSquare(filled, total) {
+  // Arrange divisions in a grid (2x2, 3x3, 4x4, etc.)
+  const gridSize = Math.ceil(Math.sqrt(total));
+  const cellSize = 200 / gridSize;
+  
+  let svgPaths = '';
+  let count = 0;
+  
+  for (let row = 0; row < gridSize; row++) {
+    for (let col = 0; col < gridSize; col++) {
+      if (count >= total) break;
+      
+      const x = col * cellSize;
+      const y = row * cellSize;
+      const isFilled = count < filled;
+      const color = isFilled ? '#fbbf24' : '#c4b5fd';
+      const opacity = isFilled ? '0.9' : '0.3';
+      
+      svgPaths += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" fill="${color}" opacity="${opacity}" stroke="#1a1033" stroke-width="2"/>`;
+      count++;
+    }
+  }
+  
+  return `<svg width="220" height="220" viewBox="0 0 200 200" style="display:inline-block; margin: 10px auto;">
+    ${svgPaths}
+  </svg>`;
+}
+
+function createDividedTriangle(filled, total) {
+  // Create a triangular grid
+  let svgPaths = '';
+  const baseY = 180;
+  const apex = { x: 100, y: 20 };
+  
+  let count = 0;
+  let row = 0;
+  
+  while (count < total) {
+    const trianglesInRow = row + 1;
+    for (let col = 0; col < trianglesInRow; col++) {
+      if (count >= total) break;
+      
+      // Calculate triangle position
+      const rowHeight = (baseY - apex.y) / (Math.ceil(Math.sqrt(total * 2)) + 1);
+      const y = apex.y + row * rowHeight;
+      const width = 200 / (row + 1);
+      const x = 50 + col * width - (row * width) / 2;
+      
+      const isFilled = count < filled;
+      const color = isFilled ? '#fbbf24' : '#c4b5fd';
+      const opacity = isFilled ? '0.9' : '0.3';
+      
+      const points = `${x},${y} ${x + width},${y} ${x + width/2},${y + rowHeight}`;
+      svgPaths += `<polygon points="${points}" fill="${color}" opacity="${opacity}" stroke="#1a1033" stroke-width="2"/>`;
+      
+      count++;
+    }
+    row++;
+  }
+  
+  return `<svg width="220" height="220" viewBox="0 0 200 200" style="display:inline-block; margin: 10px auto;">
+    ${svgPaths}
+  </svg>`;
+}
+
+function createDividedRectangle(filled, total) {
+  // Horizontal bars division
+  const barHeight = 200 / total;
+  let svgPaths = '';
+  
+  for (let i = 0; i < total; i++) {
+    const y = i * barHeight;
+    const isFilled = i < filled;
+    const color = isFilled ? '#fbbf24' : '#c4b5fd';
+    const opacity = isFilled ? '0.9' : '0.3';
+    
+    svgPaths += `<rect x="0" y="${y}" width="200" height="${barHeight}" fill="${color}" opacity="${opacity}" stroke="#1a1033" stroke-width="2"/>`;
+  }
+  
+  return `<svg width="220" height="220" viewBox="0 0 200 200" style="display:inline-block; margin: 10px auto;">
+    ${svgPaths}
+  </svg>`;
+}
+
+function createDividedHexagon(filled, total) {
+  // Create hexagonal divisions
+  let svgPaths = '';
+  const outerRadius = 80;
+  const innerRadius = outerRadius * 0.866;
+  const centerX = 100;
+  const centerY = 100;
+  
+  // Draw outer hexagon
+  let hexPoints = '';
+  for (let i = 0; i < 6; i++) {
+    const angle = (i * 60 - 90) * Math.PI / 180;
+    const x = centerX + outerRadius * Math.cos(angle);
+    const y = centerY + outerRadius * Math.sin(angle);
+    hexPoints += (i === 0 ? '' : ' ') + x + ',' + y;
+  }
+  
+  // Divide into triangular sections
+  let count = 0;
+  for (let i = 0; i < 6; i++) {
+    const angle1 = (i * 60 - 90) * Math.PI / 180;
+    const angle2 = ((i + 1) * 60 - 90) * Math.PI / 180;
+    
+    for (let j = 0; j < Math.ceil(total / 6); j++) {
+      if (count >= total) break;
+      
+      const r1 = outerRadius * (j / Math.ceil(total / 6));
+      const r2 = outerRadius * ((j + 1) / Math.ceil(total / 6));
+      
+      const x1 = centerX + r1 * Math.cos(angle1);
+      const y1 = centerY + r1 * Math.sin(angle1);
+      const x2 = centerX + r1 * Math.cos(angle2);
+      const y2 = centerY + r1 * Math.sin(angle2);
+      const x3 = centerX + r2 * Math.cos(angle1);
+      const y3 = centerY + r2 * Math.sin(angle1);
+      const x4 = centerX + r2 * Math.cos(angle2);
+      const y4 = centerY + r2 * Math.sin(angle2);
+      
+      const isFilled = count < filled;
+      const color = isFilled ? '#fbbf24' : '#c4b5fd';
+      const opacity = isFilled ? '0.9' : '0.3';
+      
+      svgPaths += `<polygon points="${x1},${y1} ${x2},${y2} ${x4},${y4} ${x3},${y3}" fill="${color}" opacity="${opacity}" stroke="#1a1033" stroke-width="1"/>`;
+      
+      count++;
+    }
+  }
+  
+  return `<svg width="220" height="220" viewBox="0 0 200 200" style="display:inline-block; margin: 10px auto;">
+    ${svgPaths}
+  </svg>`;
+}
+
+// Level 2: Modo Básico - Same denominator
+function generateSameDen() {
+  let n1, n2, d, op, resNum, resDen;
+
+  do {
+    d = rand(2, 8);
+    op = ops[rand(0, 1)];
+    n1 = rand(1, d - 1);
+    n2 = rand(1, d - 1);
+    
+    if (op === '+') {
+      resNum = n1 + n2;
+    } else {
+      resNum = n1 - n2;
+    }
+  } while (resNum <= 0); // Keep regenerating until result is positive
+
+  const s = simplify(resNum, d);
+  currentAnswer = { num: s.n, den: s.d };
+
+  document.getElementById('cards-area').innerHTML =
+    makeCard('CARTA 1', `${n1}/${d}`, '', 1) +
+    makeCard('OPERACIÓN', op, '', 2) +
+    makeCard('CARTA 2', `${n2}/${d}`, '', 3);
+
+  document.getElementById('question-text').textContent = '¿Cuál es el resultado? (simplifica si puedes)';
+  document.getElementById('emoji-visual').classList.add('hidden');
+}
+function generateDiffDen() {
+  let d1, d2, op, n1, n2, commonDen, adjN1, adjN2, resNum;
+
+  do {
+    d1 = rand(2, 8);
+    d2 = rand(2, 8);
+    while (d2 === d1) d2 = rand(2, 8);
+    op = ops[rand(0, 1)];
+
+    n1 = rand(1, d1 - 1);
+    n2 = rand(1, d2 - 1);
+    
+    // Ensure they're different fractions
+    while (n1 === n2 && d1 === d2) {
+      n2 = rand(1, d2 - 1);
+    }
+
+    commonDen = lcm(d1, d2);
+    adjN1 = n1 * (commonDen / d1);
+    adjN2 = n2 * (commonDen / d2);
+    resNum = op === '+' ? adjN1 + adjN2 : adjN1 - adjN2;
+  } while (resNum === 0 || resNum <= 0); // Keep regenerating until result is positive and not zero
+
+  const s = simplify(resNum, commonDen);
+  currentAnswer = { num: s.n, den: s.d };
+
+  document.getElementById('cards-area').innerHTML =
+    makeCard('CARTA 1', `${n1}/${d1}`, '', 1) +
+    makeCard('OPERACIÓN', op, '', 2) +
+    makeCard('CARTA 2', `${n2}/${d2}`, '', 3);
+
+  document.getElementById('question-text').textContent = '¿Cuál es el resultado? (simplifica si puedes)';
+  document.getElementById('emoji-visual').classList.add('hidden');
+}
+
+// Level 4: Fracciones Combinadas
+const specialCards = [
+  { emoji: '🧮', name: 'Calculadora', action: 'auto' },
+  { emoji: '📐', name: 'Ábaco', action: 'hint' },
+  { emoji: '👨‍🏫', name: 'Profesor', action: 'explain' }
+];
+
+// Level 2: Modo Básico - Cartas Especiales
+const basicSpecialCards = [
+  { emoji: '⚖️', name: 'Comparador', action: 'compare' },
+  { emoji: '🧀🧀', name: 'Operador', action: 'operate' }
+];
+
+let useSpecialCard = false; // Track if user wants to use special card
+let basicSpecialCardData = null; // Store data for basic special cards
+
+function generateCombinedOperations() {
+  const complexity = rand(1, 3); // 1: simple nested, 2: medium, 3: complex
+  let problem, resNum, resDen;
+
+  if (complexity === 1) {
+    problem = generateSimpleNested();
+  } else if (complexity === 2) {
+    problem = generateMediumNested();
+  } else {
+    problem = generateComplexNested();
+  }
+
+  resNum = problem.resNum;
+  resDen = problem.resDen;
+
+  const s = simplify(resNum, resDen);
+  currentAnswer = { num: s.n, den: s.d };
+  specialCard = specialCards[rand(0, specialCards.length - 1)];
+
+  document.getElementById('cards-area').innerHTML = 
+    `<div class="card-flip stagger-1 game-card rounded-2xl p-4 text-center shadow-lg" style="background:#2d1f5e; border:2px solid #3b2a6e; max-width:300px;">
+      <div class="text-xs font-semibold mb-2" style="color:#a78bfa;">OPERACIÓN COMBINADA</div>
+      <div class="text-lg font-extrabold" style="color:#fbbf24; font-family:'Fredoka',sans-serif; line-height:1.8;">${problem.display}</div>
+    </div>` +
+    `<button onclick="toggleSpecialCard()" class="card-flip stagger-2 game-card rounded-2xl p-4 text-center shadow-lg cursor-pointer hover:scale-105 transition-transform" style="background:#2d1f5e; border:2px solid #3b2a6e; min-width:100px;">
+      <div class="text-xs font-semibold mb-1" style="color:#a78bfa;">USA UNA CARTA</div>
+      <div class="text-2xl font-extrabold" style="color:#fbbf24; font-family:'Fredoka',sans-serif;">?</div>
+    </button>`;
+
+  document.getElementById('question-text').textContent = '¿Cuál es el resultado? (simplifica si puedes) - ¡Haz clic en ? para usar una carta especial!';
+  document.getElementById('emoji-visual').classList.add('hidden');
+}
+
+function toggleSpecialCard() {
+  useSpecialCard = !useSpecialCard;
+
+  if (useSpecialCard) {
+    const s = simplify(currentAnswer.num, currentAnswer.den);
+    const cardHTML = makeCard('CARTA ESPECIAL', specialCard.emoji, specialCard.name, 3);
+    
+    const cardsArea = document.getElementById('cards-area');
+    const button = cardsArea.querySelector('button');
+    button.outerHTML = cardHTML;
+
+    let msg = `¡Has sacado: ${specialCard.name}! ${specialCard.emoji}`;
+    if (specialCard.action === 'auto') {
+      document.getElementById('ans-num').value = s.n;
+      document.getElementById('ans-den').value = s.d;
+      msg += '\n\n🧮 La Calculadora te ha dado el resultado automáticamente.';
+    } else if (specialCard.action === 'hint') {
+      msg += '\n\n📐 Pista: resuelve primero lo que está entre paréntesis y corchetes, luego continúa.';
+    } else if (specialCard.action === 'explain') {
+      msg += '\n\n👨‍🏫 Consejo: simplifica siempre dividiendo numerador y denominador por su máximo común divisor.';
+    }
+    
+    showFeedback(true, msg);
+    lucide.createIcons();
+  }
+}
+
+function generateSimpleNested() {
+  let resNum, resDen, n1, d1, n2, d2, n3, d3;
+
+  do {
+    // Format: (a/b + c/d) × e/f
+    d1 = rand(2, 6);
+    d2 = rand(2, 6);
+    d3 = rand(2, 6);
+    n1 = rand(1, d1);
+    n2 = rand(1, d2);
+    n3 = rand(1, d3);
+
+    // (n1/d1 + n2/d2)
+    const cd1 = lcm(d1, d2);
+    const a1 = n1 * (cd1 / d1);
+    const a2 = n2 * (cd1 / d2);
+    const midNum = a1 + a2;
+    const midDen = cd1;
+
+    // result × n3/d3
+    resNum = midNum * n3;
+    resDen = midDen * d3;
+  } while (resNum === 0 || resDen === 0); // Keep regenerating until result is not zero
+
+  return {
+    display: `<div style="font-size:18px; line-height:2.2;">
+      (<span style="color:#fbbf24; font-weight:bold;">${n1}</span>/<span style="color:#c4b5fd;">${d1}</span> <span style="color:#22c55e; font-size:20px;">+</span> <span style="color:#fbbf24; font-weight:bold;">${n2}</span>/<span style="color:#c4b5fd;">${d2}</span>) 
+      <span style="color:#f59e0b; font-size:20px; font-weight:bold;">×</span> 
+      <span style="color:#fbbf24; font-weight:bold;">${n3}</span>/<span style="color:#c4b5fd;">${d3}</span>
+    </div>`,
+    resNum,
+    resDen
+  };
+}
+
+function generateMediumNested() {
+  let left_num, left_den, right_num, right_den, resNum, resDen;
+  let n1, d1, n2, d2, n3, d3, n4, d4;
+
+  do {
+    // Format: [a/b - c/d] × [e/f + g/h]
+    d1 = rand(2, 5);
+    d2 = rand(2, 5);
+    d3 = rand(2, 5);
+    d4 = rand(2, 5);
+    n1 = rand(2, d1);
+    n2 = rand(1, Math.min(n1 - 1, d2));
+    n3 = rand(1, d3);
+    n4 = rand(1, d4);
+
+    // [n1/d1 - n2/d2]
+    const cd1 = lcm(d1, d2);
+    const a1 = n1 * (cd1 / d1);
+    const a2 = n2 * (cd1 / d2);
+    left_num = a1 - a2;
+    left_den = cd1;
+
+    // [n3/d3 + n4/d4]
+    const cd2 = lcm(d3, d4);
+    const b1 = n3 * (cd2 / d3);
+    const b2 = n4 * (cd2 / d4);
+    right_num = b1 + b2;
+    right_den = cd2;
+
+    // result: multiply
+    resNum = left_num * right_num;
+    resDen = left_den * right_den;
+  } while (left_num === 0 || right_num === 0 || resNum === 0); // Keep regenerating until all parts are not zero
+
+  return {
+    display: `<div style="font-size:18px; line-height:2.2;">
+      [<span style="color:#fbbf24; font-weight:bold;">${n1}</span>/<span style="color:#c4b5fd;">${d1}</span> <span style="color:#ef4444; font-size:20px;">−</span> <span style="color:#fbbf24; font-weight:bold;">${n2}</span>/<span style="color:#c4b5fd;">${d2}</span>] 
+      <span style="color:#f59e0b; font-size:20px; font-weight:bold;">×</span> 
+      [<span style="color:#fbbf24; font-weight:bold;">${n3}</span>/<span style="color:#c4b5fd;">${d3}</span> <span style="color:#22c55e; font-size:20px;">+</span> <span style="color:#fbbf24; font-weight:bold;">${n4}</span>/<span style="color:#c4b5fd;">${d4}</span>]
+    </div>`,
+    resNum,
+    resDen
+  };
+}
+
+function generateComplexNested() {
+  let left_num, left_den, middle_num, middle_den, divNum, divDen, resNum, resDen;
+  let n1, d1, n2, d2, n3, d3, n4, d4, n5, d5;
+
+  do {
+    // Format: (a/b + c/d) ÷ [e/f - g/h] × i/j
+    d1 = rand(2, 5);
+    d2 = rand(2, 5);
+    d3 = rand(2, 5);
+    d4 = rand(2, 5);
+    d5 = rand(2, 5);
+    n1 = rand(1, d1);
+    n2 = rand(1, d2);
+    n3 = rand(2, d3);
+    n4 = rand(1, Math.min(n3 - 1, d4));
+    n5 = rand(1, d5);
+
+    // (n1/d1 + n2/d2)
+    const cd1 = lcm(d1, d2);
+    const a1 = n1 * (cd1 / d1);
+    const a2 = n2 * (cd1 / d2);
+    left_num = a1 + a2;
+    left_den = cd1;
+
+    // [n3/d3 - n4/d4]
+    const cd2 = lcm(d3, d4);
+    const b1 = n3 * (cd2 / d3);
+    const b2 = n4 * (cd2 / d4);
+    middle_num = b1 - b2;
+    middle_den = cd2;
+
+    // (left) ÷ (middle) = (left) × (middle inverted)
+    divNum = left_num * middle_den;
+    divDen = left_den * middle_num;
+
+    // result × n5/d5
+    resNum = divNum * n5;
+    resDen = divDen * d5;
+  } while (left_num === 0 || middle_num === 0 || resNum === 0); // Keep regenerating until all parts are not zero
+
+  return {
+    display: `<div style="font-size:16px; line-height:2.4;">
+      (<span style="color:#fbbf24; font-weight:bold;">${n1}</span>/<span style="color:#c4b5fd;">${d1}</span> <span style="color:#22c55e; font-size:18px;">+</span> <span style="color:#fbbf24; font-weight:bold;">${n2}</span>/<span style="color:#c4b5fd;">${d2}</span>) 
+      <span style="color:#3b82f6; font-size:18px; font-weight:bold;">÷</span> 
+      [<span style="color:#fbbf24; font-weight:bold;">${n3}</span>/<span style="color:#c4b5fd;">${d3}</span> <span style="color:#ef4444; font-size:18px;">−</span> <span style="color:#fbbf24; font-weight:bold;">${n4}</span>/<span style="color:#c4b5fd;">${d4}</span>] 
+      <span style="color:#f59e0b; font-size:18px; font-weight:bold;">×</span> 
+      <span style="color:#fbbf24; font-weight:bold;">${n5}</span>/<span style="color:#c4b5fd;">${d5}</span>
+    </div>`,
+    resNum,
+    resDen
+  };
+}
+
+function checkAnswer() {
+  let userNum = parseInt(document.getElementById('ans-num').value);
+  let userDen = parseInt(document.getElementById('ans-den').value);
+
+  if (isNaN(userNum) || isNaN(userDen) || userDen === 0) {
+    showFeedback(false, 'Escribe una fracción válida (el denominador no puede ser 0).');
+    return;
+  }
+
+  // Allow "1" as denominator when the answer is a whole number
+  if (isNaN(userDen)) userDen = 1;
+  
+  const userSimp = simplify(userNum, userDen);
+  const correct = userSimp.n === currentAnswer.num && userSimp.d === currentAnswer.den;
+
+  if (correct) {
+    if (gameMode === 'solo') {
+      score++;
+    } else {
+      players[currentPlayer].score++;
+    }
+    updateScoreUI();
+    spawnConfetti();
+    let msg = '🎉 ¡Muy bien! ¡Lo estás haciendo genial!';
+    if (useSpecialCard && specialCard && specialCard.action === 'explain') {
+      msg += `\n\n👨‍🏫 Explicación: La respuesta es ${currentAnswer.num}/${currentAnswer.den}. ¡Sigue así!`;
+    }
+    showFeedback(true, msg);
+  } else {
+    let explanation = `¡Buen intento! Vamos a verlo paso a paso 👇\n\nLa respuesta correcta es ${currentAnswer.num}/${currentAnswer.den}.`;
+    if (currentLevel >= 3) {
+      explanation += '\n\n💡 Recuerda: con distintos denominadores, primero busca el mínimo común múltiplo.';
+    }
+    if (currentLevel === 4) {
+      explanation += '\n\n🧮 En las fracciones combinadas, respeta el orden: paréntesis, corchetes, multiplicación/división, suma/resta.';
+    }
+    if (useSpecialCard && specialCard && specialCard.action === 'explain') {
+      explanation += `\n\n👨‍🏫 El profesor dice: simplifica siempre que puedas dividiendo numerador y denominador por su MCD.`;
+    }
+    showFeedback(false, explanation);
+  }
+
+  document.getElementById('answer-area').style.display = 'none';
+  document.getElementById('next-area').classList.remove('hidden');
+}
+
+function showFeedback(success, msg) {
+  const fb = document.getElementById('feedback');
+  fb.classList.remove('hidden');
+  fb.style.borderLeft = success ? '4px solid #22c55e' : '4px solid #ef4444';
+  fb.innerHTML = `<div class="text-sm font-semibold whitespace-pre-line" style="color:${success ? '#86efac' : '#fca5a5'};">${msg}</div>`;
+  if (!success) fb.classList.add('shake');
+  else fb.classList.remove('shake');
+}
+
+function spawnConfetti() {
+  const colors = ['#fbbf24', '#8b5cf6', '#22c55e', '#ef4444', '#3b82f6', '#ec4899'];
+  for (let i = 0; i < 20; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.left = rand(10, 90) + '%';
+    el.style.top = '-10px';
+    el.style.background = colors[rand(0, colors.length - 1)];
+    el.style.animationDelay = (rand(0, 300)) + 'ms';
+    el.style.transform = `rotate(${rand(0, 360)}deg)`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2000);
+  }
+}
+
+function showResults() {
+  showScreen('screen-results');
+  document.getElementById('final-score').textContent = `${score} / ${totalRounds}`;
+  const pct = (score / totalRounds) * 100;
+  let msg = '';
+  if (pct === 100) msg = '🌟 ¡Perfecto! ¡Eres un genio de las fracciones!';
+  else if (pct >= 60) msg = '👏 ¡Muy bien! Sigue practicando para mejorar.';
+  else msg = '💪 ¡Buen esfuerzo! Practica un poco más y lo lograrás.';
+  document.getElementById('final-message').textContent = msg;
+  if (pct >= 80) spawnConfetti();
+}
+
+// Enter key support
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !document.getElementById('answer-area').style.display?.includes('none')) {
+    checkAnswer();
+  }
+});
+
+lucide.createIcons();
+</script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e67ff5c01e6ec9a',t:'MTc3NTIxODUxMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
+
